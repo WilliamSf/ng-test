@@ -6,6 +6,7 @@ import { LikeWidgetModule } from './like-widget.module';
 
 describe(LikeWidgetComponent.name, () => {
   let fixture: ComponentFixture<LikeWidgetComponent> =  null;
+  let component: LikeWidgetComponent = null;
 
   beforeEach(async () => {
     // test first
@@ -19,24 +20,39 @@ describe(LikeWidgetComponent.name, () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(LikeWidgetComponent);
+    component = fixture.componentInstance;
   });
 
   it('Should create component',() => {
-    const component = fixture.componentInstance;
     expect(component).toBeTruthy();
   });
 
-  it('Should auto generate ID when id input property is missing', () => {
-    const component = fixture.componentInstance;
+  it('Should auto-generate ID during ngOnInit when (@Input id) is not assigned', () => {
     fixture.detectChanges();
     expect(component.id).toBeTruthy();
   });
 
-  it('Should NOT generate ID when id input property is present', () => {
-    const component = fixture.componentInstance;
+  it('Should NOT auto-generate ID during ngOnInit when (@Input id) is assigned', () => {
     const someId = 'test';
     component.id = someId;
     fixture.detectChanges();
     expect(component.id).toBe(someId);
+  });
+
+  // forma manual
+  it(`#${LikeWidgetComponent.prototype.like.name} should trigger (@Output liked) when called`, done => {
+    fixture.detectChanges();
+    component.liked.subscribe(() => {
+      expect(true).toBeTrue();
+      done();
+    });
+    component.like();
+  });
+
+  it(`#${LikeWidgetComponent.prototype.like.name} should trigger (@Output liked) when called`, () => {
+    spyOn(component.liked, 'emit');
+    fixture.detectChanges();
+    component.like();
+    expect(component.liked.emit).toHaveBeenCalled();
   });
 });
